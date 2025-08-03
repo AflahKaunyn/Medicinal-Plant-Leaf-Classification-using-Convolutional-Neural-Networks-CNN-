@@ -2,22 +2,25 @@ import streamlit as st
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
-import gdown
 from PIL import Image
+import requests
 import os
 
-# --- Cached model downloader and loader ---
+# ---- Cached download and model loader ----
 @st.cache_resource(show_spinner=True)
-def load_model_from_drive():
-    url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"  # replace with your actual URL if different
-    model_path = "medicinal_plant_model.h5"
-    if not os.path.exists(model_path):
-        gdown.download(url, model_path, quiet=False)
-    model = tf.keras.models.load_model(model_path)
-    return model
+def load_model_from_github():
+    url = "https://raw.githubusercontent.com/AflahKaunyn/Medicinal-Plant-Leaf-Classification-using-Convolutional-Neural-Networks-CNN-/main/medicinal_plant_model.keras"  # Change to your raw model file URL
+    output = "medicinal_plant_model.keras"
+    if not os.path.exists(output):
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            with open(output, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+    return tf.keras.models.load_model(output)
 
-# Load model once
-model = load_model_from_drive()
+model = load_model_from_github()
+
 
 # Class labels matching your training data classes
 classes = [
@@ -277,3 +280,4 @@ if uploaded_file is not None:
 
 else:
     st.info("Please upload a leaf image to begin identification.")
+
