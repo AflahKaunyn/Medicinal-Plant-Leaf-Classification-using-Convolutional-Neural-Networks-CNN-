@@ -48,3 +48,10 @@ This project is a deep learning-based web application that classifies medicinal 
 3. **Run the Flask app:**
    python app.py
 
+
+**📜 License** 
+
+This project is intended for educational and research purposes only.  
+Feel free to use or modify the code for non-commercial use with proper credit.  
+No warranties provided.
+
