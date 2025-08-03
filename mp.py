@@ -6,13 +6,13 @@ from tensorflow.keras.preprocessing import image
 import gdown
 from PIL import Image
 
-# Download and load model
 @st.cache_resource
 def download_model():
     url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"
     output = "medicinal_plant_model.h5"
     gdown.download(url, output, quiet=False)
-    return load_model(output)  # ✅ directly load the full model
+    return tf.keras.models.load_model(output)  # only valid if .h5 has full model
+
 
 model = download_model()  # model is now loaded completely
 
@@ -269,6 +269,7 @@ if uploaded_file:
 
     st.markdown("### 🧉 How to Use")
     st.write(info["how_to_use"])
+
 
 
 
