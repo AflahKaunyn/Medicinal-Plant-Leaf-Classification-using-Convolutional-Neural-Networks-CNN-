@@ -12,11 +12,9 @@ def download_model():
     url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"
     output = "medicinal_plant_model.h5"
     gdown.download(url, output, quiet=False)
-    return output
+    return load_model(output)  # ✅ directly load the full model
 
-model_path = download_model()# Load the complete model directly from the .h5 file
-model = load_model(model_path)
-
+model = download_model()  # model is now loaded completely
 
 # Class labels
 classes = [
@@ -271,5 +269,6 @@ if uploaded_file:
 
     st.markdown("### 🧉 How to Use")
     st.write(info["how_to_use"])
+
 
 
