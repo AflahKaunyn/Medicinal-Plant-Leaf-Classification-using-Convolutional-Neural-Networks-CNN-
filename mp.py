@@ -15,7 +15,25 @@ def download_model():
     return output
 
 model_path = download_model()
-model = load_model(model_path)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+# Rebuild architecture (adjust if different)
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3)),
+    MaxPooling2D(2, 2),
+    
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+    
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(41, activation='softmax')  # 41 classes in your dataset
+])
+
+# Load weights from your .h5 file
+model.load_weights(model_path)
 
 # Class labels
 classes = [
@@ -270,3 +288,4 @@ if uploaded_file:
 
     st.markdown("### 🧉 How to Use")
     st.write(info["how_to_use"])
+
