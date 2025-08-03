@@ -245,24 +245,22 @@ st.write("Upload a leaf image to identify the plant and explore its medicinal be
 uploaded_file = st.file_uploader("📷 Upload a leaf image", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
     try:
-        img = Image.open(uploaded_file).convert('RGB')         
-        img_resized = img.resize((224, 224))                   
+        img = Image.open(uploaded_file).convert('RGB')         # Always convert to RGB (3 channels)
+        img_resized = img.resize((224, 224))                   # Always resize to 224x224
         img_array = image.img_to_array(img_resized)
-        img_array = np.expand_dims(img_array, axis=0) / 255.0  
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-        # Predict
+        # Model prediction and Streamlit outputs here
         preds = model.predict(img_array)
         class_index = np.argmax(preds[0])
         prediction = classes[class_index]
 
-        # Fetch plant info; fallback if missing
         info = plant_info.get(prediction, {
             'medicinal_properties': 'Information not available.',
             'used_for': 'Information not available.',
             'how_to_use': 'Information not available.'
         })
 
-        # Display results
         st.success(f"🌱 Identified Plant: **{prediction}**")
         st.markdown("### 🧪 Medicinal Properties")
         st.info(info['medicinal_properties'])
