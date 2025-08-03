@@ -1,26 +1,25 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import gdown
 from PIL import Image
 import os
 
-# Ensure the model is downloaded and loaded only once
-@st.cache_resource
-def get_model():
-    url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"
-    output = "medicinal_plant_model.h5"
-    if not os.path.exists(output):
-        gdown.download(url, output, quiet=False)
-    model = tf.keras.models.load_model(output)
+# --- Cached model downloader and loader ---
+@st.cache_resource(show_spinner=True)
+def load_model_from_drive():
+    url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"  # replace with your actual URL if different
+    model_path = "medicinal_plant_model.h5"
+    if not os.path.exists(model_path):
+        gdown.download(url, model_path, quiet=False)
+    model = tf.keras.models.load_model(model_path)
     return model
 
-# Load the model
-model = get_model()
+# Load model once
+model = load_model_from_drive()
 
-# Class labels
+# Class labels matching your training data classes
 classes = [
     'Aloevera', 'Amla', 'Amruta_Balli', 'Arali', 'Ashoka', 'Ashwagandha', 'Avocado', 'Bamboo',
     'Basale', 'Betel', 'Betel_Nut', 'Brahmi', 'Castor', 'Curry_Leaf', 'Doddapatre', 'Ekka',
@@ -29,6 +28,7 @@ classes = [
     'Pappaya', 'Pepper', 'Pomegranate', 'Raktachandini', 'Rose', 'Sapota', 'Tulasi', 'Wood_sorel'
 ]
 
+# Include your full plant_info dictionary here exactly as you have it
 plant_info = {
       'Aloevera': {
         'medicinal_properties': 'Anti-inflammatory, soothing, healing.',
@@ -232,7 +232,9 @@ plant_info = {
     }
 }
 
-st.set_page_config(page_title="Medicinal Plant Classifier", layout="centered")
+
+# Streamlit UI Setup
+st.set_page_config(page_title="Medicinal Plant Leaf Classifier", layout="centered")
 
 st.title("🌿 Medicinal Plant Leaf Classifier")
 st.write("Upload a leaf image to identify the plant and explore its medicinal benefits.")
@@ -240,34 +242,38 @@ st.write("Upload a leaf image to identify the plant and explore its medicinal be
 uploaded_file = st.file_uploader("📷 Upload a leaf image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Leaf Image", width=300)
+    try:
+        img = Image.open(uploaded_file).convert('RGB')
+        st.image(img, caption="Uploaded Leaf Image", use_column_width=True)
 
-    # Preprocess image for model
-    img_resized = img.resize((224, 224))
-    img_array = image.img_to_array(img_resized)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0
+        # Preprocess image to fit model input
+        img_resized = img.resize((224, 224))
+        img_array = image.img_to_array(img_resized)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-    # Predict
-    preds = model.predict(img_array)
-    class_index = np.argmax(preds[0])
-    prediction = classes[class_index]
+        # Predict
+        preds = model.predict(img_array)
+        class_index = np.argmax(preds[0])
+        prediction = classes[class_index]
 
-    # Plant info
-    info = plant_info.get(prediction, {
-        'medicinal_properties': 'Information not available.',
-        'used_for': 'Information not available.',
-        'how_to_use': 'Information not available.'
-    })
+        # Fetch plant info; fallback if missing
+        info = plant_info.get(prediction, {
+            'medicinal_properties': 'Information not available.',
+            'used_for': 'Information not available.',
+            'how_to_use': 'Information not available.'
+        })
 
-    st.success(f"🌱 Identified Plant: **{prediction}**")
-    st.markdown("### 🧪 Medicinal Properties")
-    st.info(info['medicinal_properties'])
-    st.markdown("### 💊 Common Uses")
-    st.write(info['used_for'])
-    st.markdown("### 🧉 How to Use")
-    st.write(info['how_to_use'])
+        # Display results
+        st.success(f"🌱 Identified Plant: **{prediction}**")
+        st.markdown("### 🧪 Medicinal Properties")
+        st.info(info['medicinal_properties'])
+        st.markdown("### 💊 Common Uses")
+        st.write(info['used_for'])
+        st.markdown("### 🧉 How to Use")
+        st.write(info['how_to_use'])
 
-# Optional: If no file is uploaded, prompt the user
+    except Exception as e:
+        st.error(f"An error occurred while processing the image: {e}")
+
 else:
-    st.info("Please upload a leaf image to begin.")
+    st.info("Please upload a leaf image to begin identification.")
