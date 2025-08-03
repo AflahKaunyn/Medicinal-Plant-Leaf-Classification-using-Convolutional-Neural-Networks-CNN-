@@ -58,9 +58,10 @@ if uploaded_file:
     st.image(img, caption="Uploaded Leaf Image", width=300)
 
     # Preprocess image
-    img = img.resize((224, 224))
+    img = img.resize((224, 224)).convert('RGB')  # Ensure it's 3-channel
     img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    img_array = img_array / 255.0  # Normalize
 
     # Prediction
     preds = model.predict(img_array)
@@ -85,3 +86,4 @@ if uploaded_file:
 
     st.markdown("### 🧉 How to Use")
     st.write(info["how_to_use"])
+
