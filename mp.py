@@ -244,11 +244,11 @@ st.write("Upload a leaf image to identify the plant and explore its medicinal be
 
 uploaded_file = st.file_uploader("📷 Upload a leaf image", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
-    img = Image.open(uploaded_file).convert('RGB')         # Ensures the image is always in RGB (3 channels)
-    img_resized = img.resize((224, 224))                   # Ensures correct input size
-    img_array = image.img_to_array(img_resized)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0  # Normalizes and adds batch dimension
-    # ... proceed with prediction, etc. ...
+    try:
+        img = Image.open(uploaded_file).convert('RGB')         
+        img_resized = img.resize((224, 224))                   
+        img_array = image.img_to_array(img_resized)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0  
 
         # Predict
         preds = model.predict(img_array)
@@ -276,5 +276,3 @@ if uploaded_file is not None:
 
 else:
     st.info("Please upload a leaf image to begin identification.")
-
-
