@@ -5,22 +5,17 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import gdown
-import os
 
-# Streamlit Page Configuration
-st.set_page_config(page_title="Medicinal Plant Classifier", layout="centered")
-
-# Download and Load Model
+# Download the model
 @st.cache_resource
 def download_model():
-    model_file = "medicinal_plant_model.h5"
-    if not os.path.exists(model_file):
-        url = "https://drive.google.com/uc?id=1kFhEUUcOICRVMHI-nZQL0VKRrD5L0UGh"
-        gdown.download(url, model_file, quiet=False)
-    return model_file
+    url = "https://drive.google.com/uc?id=1kw9k-XBOCXGE2pHTCGhNeez-cZM3D9UW"
+    output = "model.h5"
+    gdown.download(url, output, quiet=False)
+    model = load_model(output)
+    return model
 
-model_path = download_model()
-model = load_model(model_path)
+model = download_model()
 
 # Class labels
 classes = [
@@ -50,40 +45,22 @@ plant_info = {
 st.title("🌿 Medicinal Plant Leaf Classifier")
 st.write("Upload a leaf image to identify the plant and explore its medicinal benefits.")
 
-# File Upload
-uploaded_file = st.file_uploader("📷 Upload a leaf image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload a plant leaf image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file:
+if uploaded_file is not None:
     img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Leaf Image", width=300)
+    st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess image
-    img = img.resize((224, 224)).convert('RGB')  # Ensure it's 3-channel
+    # Preprocess
+    img = img.resize((224, 224)).convert('RGB')
     img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-    img_array = img_array / 255.0  # Normalize
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
 
-    # Prediction
-    preds = model.predict(img_array)
-    class_index = np.argmax(preds[0])
-    prediction = classes[class_index]
+    # Predict
+    prediction = model.predict(img_array)
+    predicted_class = np.argmax(prediction)
 
-    # Look up info
-    info = plant_info.get(prediction, {
-        'medicinal_properties': 'Information not available.',
-        'used_for': 'Information not available.',
-        'how_to_use': 'Information not available.'
-    })
+    st.write(f"Predicted class: {predicted_class}")
 
-    # Output Results
-    st.success(f"🌱 Identified Plant: **{prediction}**")
-
-    st.markdown("### 🧪 Medicinal Properties")
-    st.info(info["medicinal_properties"])
-
-    st.markdown("### 💊 Common Uses")
-    st.write(info["used_for"])
-
-    st.markdown("### 🧉 How to Use")
-    st.write(info["how_to_use"])
 
