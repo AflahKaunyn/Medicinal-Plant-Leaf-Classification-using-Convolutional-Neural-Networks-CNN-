@@ -3,14 +3,14 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-from PIL import Image
 import gdown
+from PIL import Image
 
-# Download the model
+# Download and load model
 @st.cache_resource
 def download_model():
     url = "https://drive.google.com/uc?id=1kw9k-XBOCXGE2pHTCGhNeez-cZM3D9UW"
-    output = "model.h5"
+    output = "medicinal_plant_model1.h5"
     gdown.download(url, output, quiet=False)
     model = load_model(output)
     return model
@@ -62,5 +62,6 @@ if uploaded_file is not None:
     predicted_class = np.argmax(prediction)
 
     st.write(f"Predicted class: {predicted_class}")
+
 
 
