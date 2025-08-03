@@ -22,9 +22,11 @@ This project is a deep learning-based web application that classifies medicinal 
 
 ## 🖼️ Dataset
 
-- Includes images for over 40 classes of medicinal plants.
+- Includes images for 40 classes of medicinal plants.
 - Each class has 100–200 labeled images.
 - Data Augmentation techniques were used to improve generalization.
+- Amruta_Balli, Amla, Aloevera, Arali, Ashoka, Ashwagandha, Avocado, Bamboo, Basale, Betel, Betel_Nut, Brahmi, Castor, Curry_Leaf, Doddapatre, Ekka, Ganike, Geranium, Guava, Henna, Hibiscus, Honge, Insulin, Jasmine, Lemon, Lemon_grass, Mango, Mint, Nagadali, Neem, Nithyapushpa, Nooni, Pappaya, Pepper, Pomegranate, Raktachandini, Rose, Sapota, Tulasi, Wood_sorel
+
 
 ## 💻 Technologies Used
 
@@ -37,6 +39,12 @@ This project is a deep learning-based web application that classifies medicinal 
 ## 🚀 How to Run
 
 1. **Clone the repository:**
-   ```bash
    git clone https://github.com/yourusername/medicinal-plant-classification.git
    cd medicinal-plant-classification
+   
+2. **Set up environment:**
+   pip install -r requirements.txt
+
+3. **Run the Flask app:**
+   python app.py
+
